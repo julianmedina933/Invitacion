@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mi San Valentín 💘</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Fondo dividido */
+    .background {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      z-index: -2;
+    }
+
+    .side {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .side img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .side img.active { opacity: 1; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.15);
+      z-index: -1;
+    }
+
+    /* Tarjeta */
+    .card {
+      width: min(92%, 420px);
+      padding: 40px 30px 45px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(30px);
+      border-radius: 28px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.3);
+      z-index: 5;
+      animation: cardIn 1s ease;
+      position: relative;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .emoji {
+      font-size: 60px;
+      margin-bottom: 12px;
+      animation: heartbeat 1.8s infinite;
+    }
+
+    @keyframes heartbeat {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    h2 {
+      font-family: "Playfair Display", serif;
+      font-size: 26px;
+      color: white;
+      margin-bottom: 30px;
+      line-height: 1.4;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .buttons {
+  position: relative;
+  height: 80px;
+  overflow: hidden; /* evita que se vea fuera */
+}
+
+    button {
+      position: absolute;
+      padding: 14px 36px;
+      border-radius: 40px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    #yes {
+      left: 10%;
+      background: linear-gradient(135deg, #ff4d6d, #ff758f);
+      color: white;
+    }
+
+    #no {
+  position: fixed;
+  background: white;
+  color: #777;
+  z-index: 100;
+  left: 60%;
+  top: 60%;
+}
+
+    .hint {
+      margin-top: 28px;
+      font-size: 13px;
+      color: white;
+      font-style: italic;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Corazones */
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      animation: floatUp linear forwards;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) scale(1); opacity: 1; }
+      to { transform: translateY(-120vh) scale(1.8); opacity: 0; }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="background">
+   <!-- LADO IZQUIERDO -->
+    <div class="side left">
+      <img src="foto1.jpeg" class="active">
+      <img src="foto2.jpeg">
+      <img src="foto3.jpeg">
+      <img src="foto4.jpeg">
+      <img src="foto5.jpeg">
+      <img src="foto6.jpeg">
+      <img src="foto7.jpeg">
+      <img src="foto8.jpeg">
+      <img src="foto9.jpeg">
+      <img src="foto10.jpeg">
+      <img src="foto11.jpeg">
+      <img src="foto12.jpeg">
+    </div>
+
+    <!-- LADO DERECHO -->
+    <div class="side right">
+      <img src="foto13.jpeg" class="active">
+      <img src="foto14.jpeg">
+      <img src="foto15.jpeg">
+      <img src="foto16.jpeg">
+      <img src="foto17.jpeg">
+      <img src="foto18.jpeg">
+      <img src="foto19.jpeg">
+      <img src="foto20.jpeg">
+      <img src="foto21.jpeg">
+      <img src="foto22.jpeg">
+      <img src="foto23.jpeg">
+      <img src="foto24.jpeg">
+      <img src="foto25.jpeg">
+    </div>
+  </div>
+
+  <div class="overlay"></div>
+
+  <div class="card">
+    <div class="emoji">🐱❤️</div>
+    <h2 id="mainText">Amor,<br>¿Quieres ser mi San Valentín? 💕</h2>
+
+    <div class="buttons">
+      <button id="yes">Sí 💖</button>
+      <button id="no">No 🙈</button>
+    </div>
+
+    <div class="hint">Algunas historias de amor no aceptan un “no” ✨</div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yes");
+    const noBtn = document.getElementById("no");
+    const mainText = document.getElementById("mainText");
+    const card = document.querySelector(".card");
+
+    let noClicks = 0;
+
+    // Movimiento del botón NO cuando el mouse se acerca
+    noBtn.addEventListener("mouseenter", () => {
+
+  const btnWidth = noBtn.offsetWidth;
+  const btnHeight = noBtn.offsetHeight;
+
+  const padding = 20;
+
+  // Posición actual
+  const currentLeft = noBtn.offsetLeft;
+  const currentTop = noBtn.offsetTop;
+
+  // Distancia máxima que puede moverse por salto
+  const moveDistance = 250; // puedes ajustar (80 más suave, 150 más loco)
+
+  // Movimiento relativo
+  let newX = currentLeft + (Math.random() * moveDistance - moveDistance / 2);
+  let newY = currentTop + (Math.random() * moveDistance - moveDistance / 2);
+
+  // Limitar dentro de pantalla
+  const maxX = window.innerWidth - btnWidth - padding;
+  const maxY = window.innerHeight - btnHeight - padding;
+
+  newX = Math.max(padding, Math.min(newX, maxX));
+  newY = Math.max(padding, Math.min(newY, maxY));
+
+  noBtn.style.left = newX + "px";
+  noBtn.style.top = newY + "px";
+});
+
+
+    // Si logran hacer click
+    noBtn.addEventListener("click", () => {
+      noClicks++;
+
+      if (noClicks === 1) {
+        mainText.innerHTML = "¿Estás segura? 😢";
+      } else if (noClicks === 2) {
+        mainText.innerHTML = "¿Segurísima? 🥺";
+      } else {
+        mainText.innerHTML = "Sabía que no podías resistirte 😏💕";
+      }
+    });
+
+    // Botón SI
+    yesBtn.addEventListener("click", () => {
+
+  // Explosión múltiple de confetti
+  const duration = 3000;
+  const end = Date.now() + duration;
+
+  const interval = setInterval(() => {
+    confetti({
+      particleCount: 50,
+      spread: 160,
+      startVelocity: 60,
+      origin: { x: Math.random(), y: Math.random() - 0.2 }
+    });
+
+    if (Date.now() > end) {
+      clearInterval(interval);
+    }
+  }, 200);
+
+  // Lluvia intensa de corazones
+  for (let i = 0; i < 80; i++) {
+    setTimeout(createHeart, i * 30);
+  }
+
+  // Flash romántico
+  const flash = document.createElement("div");
+  flash.style.position = "fixed";
+  flash.style.inset = "0";
+  flash.style.background = "white";
+  flash.style.opacity = "0.8";
+  flash.style.zIndex = "50";
+  flash.style.transition = "opacity 0.6s ease";
+  document.body.appendChild(flash);
+
+  setTimeout(() => {
+    flash.style.opacity = "0";
+    setTimeout(() => flash.remove(), 600);
+  }, 200);
+
+  // Mensaje eufórico
+  setTimeout(() => {
+    card.innerHTML = `
+      <div style="font-size:80px; animation: pop 0.8s ease;">💖</div>
+      <h2 style="color:white; font-size:30px;">
+        Bravoooo!!!, Yo lo sabia jiji 😍✨
+      </h2>
+      <p style="margin-top:15px; color:white; font-size:18px;">
+        Preparat para pasar un 14 de febrero con tu Amor 💕💞
+      </p>
+    `;
+  }, 800);
+
+});
+
+    // Slides
+    const leftImages = document.querySelectorAll(".left img");
+    let leftIndex = 0;
+    setInterval(() => {
+      leftImages[leftIndex].classList.remove("active");
+      leftIndex = (leftIndex + 1) % leftImages.length;
+      leftImages[leftIndex].classList.add("active");
+    }, 3000);
+
+    const rightImages = document.querySelectorAll(".right img");
+    let rightIndex = 0;
+    setInterval(() => {
+      rightImages[rightIndex].classList.remove("active");
+      rightIndex = (rightIndex + 1) % rightImages.length;
+      rightImages[rightIndex].classList.add("active");
+    }, 3500);
+
+    // Corazones
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.innerHTML = Math.random() > 0.5 ? "❤️" : "💗";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.fontSize = Math.random() * 22 + 14 + "px";
+      heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+      heart.style.opacity = Math.random() * 0.5 + 0.4;
+
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 8000);
+    }
+
+    setInterval(createHeart, 150);
+  </script>
+
+</body>
+</html>
